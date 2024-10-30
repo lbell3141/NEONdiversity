@@ -52,6 +52,7 @@ ggplot(plot_df, aes(x = temp_zscore, y = ndvi_zscore, color = year)) +
     plot.title = element_text(hjust = 0.5),
     axis.text.x = element_text(angle = 0, hjust = 1)
   ) +
+  xlim(-1.5, 1.5) +
   facet_wrap(~ site, ncol = 2) +
   geom_hline(yintercept = 0, color = "lightblue", linetype = "dashed") +
   geom_vline(xintercept = 0, color = "lightblue", linetype = "dashed") +
