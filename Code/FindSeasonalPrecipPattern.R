@@ -16,7 +16,7 @@ library(tidyverse)
 #===============================================================================
 #Identify Date and Precip Columns in Flux Data
 #===============================================================================
-flux_data <- read.csv("./Data/FluxData/Regular/AMF_US-SRM_BASE_HH_28-5.csv", na.strings = -9999, sep = ",", skip = 2)
+flux_data <- read.csv("./Data/FluxData/Regular/AMF_US-CMW_BASE_HH_2-5.csv", na.strings = -9999, sep = ",", skip = 2)
 
 flux_data$TIMESTAMP_START <- ymd_hm(flux_data$TIMESTAMP_START)
 
@@ -83,3 +83,5 @@ result_df <- result_df%>%
   WinterPrecipZscore < 0 & SummerPrecipZscore > 0 ~ "DW",
   WinterPrecipZscore > 0 & SummerPrecipZscore < 0 ~ "WD",
   WinterPrecipZscore > 0 & SummerPrecipZscore > 0 ~ "WW"))
+
+write.csv(result_df, file = "./Data/PrecipConditions.csv")

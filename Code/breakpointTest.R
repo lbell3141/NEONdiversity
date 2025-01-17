@@ -20,9 +20,17 @@ plot(bptest$RecordNum, bptest$Precip)
 
 #Using the selected breakpoint test try to detect a breakpoint in V 
 #then associate the p-value to Nb = 1.
-
-test <- N_break_point(bptest$Precip, n_max = 1, n_period = 15, seed_set = 4557)
-
 AccRainDF <- bptest%>%
-  mutate(AccRain = cumsum(Precip))
-plot(AccRainDF$RecordNum, AccRainDF$AccRain)
+  mutate(AccRain = cumsum(Precip))%>%
+  mutate(RecordNum = seq(1, nrow(AccRainDF), 1))
+
+bps<- N_break_point(bptest$Precip, n_max = 2, n_period = 15, seed_set = 4557)
+bps_position <- bps[[1]]$breaks[[2]]
+
+ggplot(AccRainDF, aes(x = RecordNum, y = AccRain)) +
+  geom_point(color = "black") +
+  labs(x = "Record Number (Oct-Sep)", y = "Accumulated Rainfall", title = "Accumulated Rainfall with Breakpoints") +
+  geom_vline(xintercept = bps_position[1], color = "red", linetype = "dashed", size = 1) +
+  geom_vline(xintercept = bps_position[2], color = "red", linetype = "dashed", size = 1) +
+  #geom_vline(xintercept = bps_position[3], color = "red", linetype = "dashed", size = 1) +
+  theme_minimal()
