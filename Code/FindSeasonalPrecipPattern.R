@@ -26,9 +26,9 @@ columns_of_interest <- flux_data %>%
             Day = day(TIMESTAMP_START),
             Day_of_Year = yday(TIMESTAMP_START))%>%
   group_by(Year, Month, Day)%>%
-  mutate(Precip = sum(P, na.rm = T))%>% #may need to change to P_PI
+  mutate(Precip =sum(P, na.rm = T))%>% #may need to change to P_PI
   select(Year, Month, Day, Day_of_Year, Precip) #note precip is in mm
-
+columns_of_interest <- distinct(columns_of_interest)
 #plot(columns_of_interest$Day_of_Year, columns_of_interest$Precip)
 
 #===============================================================================
