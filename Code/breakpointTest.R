@@ -34,3 +34,45 @@ ggplot(AccRainDF, aes(x = RecordNum, y = AccRain)) +
   geom_vline(xintercept = bps_position[2], color = "red", linetype = "dashed", size = 1) +
   #geom_vline(xintercept = bps_position[3], color = "red", linetype = "dashed", size = 1) +
   theme_minimal()
+#===============================================================================
+#===============================================================================
+#===============================================================================
+test_list <- list(
+  "X" = data.frame(
+    WaterYr = rep(2003:2005, each = 50),
+    P_F = runif(150),
+    C = runif(150)
+  ),
+  "Y" = data.frame(
+    WaterYr = rep(2003:2005, each = 50),
+    P_F = runif(150),
+    C = runif(150)
+  )
+)
+
+NestedBrkPts_dfs <- lapply(test_list, function(i) {
+  i %>%
+    group_by(WaterYr) %>%
+    summarize(
+      BreakPoints = N_break_point(P_F, n_max = 2, n_period = 15, seed_set = 4557)
+    )})
+
+ExtractedBrkPts_dfs <- lapply(NestedBrkPts_dfs, function(i) {
+  lapply(seq_along(i$BreakPoints), function(index) {
+    j <- i$BreakPoints[[index]]
+    
+    # Extract the breaks and assign BP1 and BP2
+    BP1 <- j$breaks[[2]][1]
+    BP2 <- j$breaks[[2]][2]
+    
+    # Extract WaterYr (since each element in i$BreakPoints corresponds to a WaterYr)
+    WaterYr <- i$WaterYr[index]
+    
+    # Return a data frame with BP1, BP2, and WaterYr for each nested BreakPoint
+    data.frame(WaterYr = WaterYr, BP1 = BP1, BP2 = BP2)
+  })
+})
+BrkPts_bind <- lapply(ExtractedBrkPts_dfs, function(i){
+  i%>%
+    bind_rows()
+})
