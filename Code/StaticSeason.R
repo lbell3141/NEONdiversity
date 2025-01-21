@@ -52,7 +52,7 @@ raw_data_coi <- lapply(raw_data_csvs, function(i){
 raw_data_wateryr <- lapply(raw_data_coi, function(i){
   i %>%
     mutate(WaterYr = ifelse(Month > 9, Year + 1, Year))
-  })
+})
 raw_data_WYrecord <- lapply(raw_data_wateryr, function(i){
   i %>%
     group_by(WaterYr)%>%
@@ -75,9 +75,9 @@ NestedBrkPts_dfs <- pblapply(raw_data_WYrecord, function(i) {
 ExtractedBrkPts_dfs <- lapply(NestedBrkPts_dfs, function(i) {
   lapply(seq_along(i$BreakPoints), function(index) {
     j <- i$BreakPoints[[index]]
-      BP1 <- j$breaks[[2]][1]
-      BP2 <- j$breaks[[2]][2]
-      WaterYr <- i$WaterYr[index]
+    BP1 <- j$breaks[[2]][1]
+    BP2 <- j$breaks[[2]][2]
+    WaterYr <- i$WaterYr[index]
     
     data.frame(WaterYr = WaterYr, BP1 = BP1, BP2 = BP2)
   })
@@ -97,10 +97,10 @@ merged_dfs <- mapply(function(i, j) {
 dfs_rainy_season <- lapply(merged_dfs, function(i){
   i%>%
     mutate(Season = case_when(
-        WYrecord < BP1 ~ "Winter",
-        WYrecord > BP2 ~ "Summer",
-        TRUE ~ "Spring"))
-    })
+      WYrecord < BP1 ~ "Winter",
+      WYrecord > BP2 ~ "Summer",
+      TRUE ~ "Spring"))
+})
 
 dfs_rainy_season <- lapply(dfs_rainy_season, function(i){
   i%>%
@@ -111,11 +111,11 @@ dfs_rainy_season <- lapply(dfs_rainy_season, function(i){
 dfs_wLongterm_precip <- lapply(dfs_rainy_season, function(i){
   i%>%
     group_by(WaterYr, Season)%>%
-      mutate(SeasonalPrecip = sum(P_F, na.rm = T))%>%
+    mutate(SeasonalPrecip = sum(P_F, na.rm = T))%>%
     ungroup()%>%
     group_by(Season)%>%
-      mutate(PrecipLongtermAvg = mean(SeasonalPrecip, na.rm = T),
-             PrecipLongtermSD = sd(SeasonalPrecip, na.rm = T))
+    mutate(PrecipLongtermAvg = mean(SeasonalPrecip, na.rm = T),
+           PrecipLongtermSD = sd(SeasonalPrecip, na.rm = T))
 })
 
 precip_zscore_dfs <- lapply(dfs_wLongterm_precip, function(i){

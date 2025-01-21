@@ -17,3 +17,13 @@ ggplot(final_df, aes(x = WinterPrecipZScore, y = GPPZScore, color = PrecipCondit
     color = "Precipitation Condition"
   )
 
+test <- dfs_rainy_season[[3]]
+test <- test%>%
+  filter(WaterYr==2008)
+ggplot(test, aes(x = WYrecord, y = P_F, color = Season)) +
+  geom_point() +
+  labs(x = "Record Number (Oct-Sep)", 
+       y = "Accumulated Rainfall", 
+       title = "Accumulated Rainfall with Precip Breakpoints",
+       color = "Season") +
+  theme_minimal()
