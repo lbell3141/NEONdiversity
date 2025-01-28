@@ -70,16 +70,16 @@ IGBP_df <- read.csv(IGBPmetadata)%>%
 
 gppbio <- merge(BioZscoreDf, FluxZscoreDf, by = c("SiteID", "Year"))
 gppbio <- merge(gppbio, IGBP_df, by = "SiteID")
-
-#also make longterm average frame
-LTbio <- BioZscoreDfcalcs%>%
-  select(Product, SiteID, BioLongtermAvg)%>%
+#-------------------------------------------------------------------------------
+#And Make Longterm Avg Dataframe 
+#-------------------------------------------------------------------------------
+LTAVals <- merge(results_df, BioZscoreDfcalcs, by = c("SiteID", "Year"))%>%
+  select(SiteID, Product, Year, TotalGPP, Biomass)%>%
+  group_by(SiteID, Product)%>%
+  summarise(LongAvgGPP = mean(TotalGPP, na.rm = T),
+            LongAvgBio = mean(Biomass, na.rm = T))
+LTAVals <- merge(LTAVals, IGBP_df, by = "SiteID")%>%
   distinct()
-LTGPP <- results_df%>%
-  select(SiteID, GPPLongtermAvg)%>%
-  distinct()
-LongTermDf <- merge(LTbio, LTGPP, by = "SiteID")
-LongTermDf <- merge(LongTermDf, IGBP_df, by = "SiteID")
 #===============================================================================
 #Visualize Data
 #===============================================================================
@@ -100,7 +100,7 @@ AllSitesByProd <- ggplot(gppbio, aes(x = BiomassZscore, y = GPPZScore, color = I
   theme_minimal() +
   facet_wrap(~ Product, scales = "free")
 
-Longterm_plot <- ggplot(LongTermDf, aes(x = BioLongtermAvg, y = GPPLongtermAvg, color = IGBP_name)) +
+Longterm_plot <- ggplot(LTAVals, aes(x = LongAvgBio, y = LongAvgGPP, color = IGBP_name)) +
   geom_point() +
   labs(x = "Biomass Record Average", 
        y = "GPP Record Average", 
@@ -108,3 +108,15 @@ Longterm_plot <- ggplot(LongTermDf, aes(x = BioLongtermAvg, y = GPPLongtermAvg, 
        color = "IGBP_name") +
   theme_minimal() +
   facet_wrap(~ Product, scales = "free")
+
+
+testdf <- LTAVals%>%
+  filter(Product == "chopping")
+Longterm_plot <- ggplot(testdf, aes(x = LongAvgBio, y = LongAvgGPP)) +
+  geom_point() +
+  labs(x = "Biomass Record Average", 
+       y = "GPP Record Average", 
+       title = "Biomass-GPP Longterm Average Comparison") +
+  theme_minimal() +
+  facet_wrap(~ IGBP_name, scales = "free")
+Longterm_plot
