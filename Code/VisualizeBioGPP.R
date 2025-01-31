@@ -6,6 +6,7 @@
 library(ggplot2)
 library(dplyr)
 library(purrr)
+library(viridis)
 #===============================================================================
 #Visualize Longterm Flux/Biomass Averages by Product
 #===============================================================================
@@ -46,7 +47,59 @@ ProdPlots <- AllProdLongtermDat %>%
 #products are "xu", "esa_cci", "liu", "hfbs", "gfw", "gedi", "menlove", "icesat", "lt_gnn", "chopping", "nbcd"
 #run code chunk above and then plots[[name]] to see in window
 ProdPlots[["xu"]]
+#===============================================================================
+#Visualize Longterm Flux/Biomass Averages by Aridity
+#===============================================================================
+Longterm_plot <- ggplot(LongDatwAI, aes(x = BioLongtermAvg, y = GPPLongtermAvg, color = AI)) +
+  geom_point() +
+  scale_color_gradientn(
+    colors = c("red", "yellow", "blue"),  
+    values = c(0, 0.2, 1),
+    limits = c(0, 10))+
+  labs(x = "Biomass Record Average", 
+       y = "GPP Record Average", 
+       title = "Biomass-GPP Longterm Average Comparison",
+       color = "AI") +
+  theme_minimal() +
+  facet_wrap(~ Product, scales = "free")
+Longterm_plot
 
+ProdPlots <- LongDatwAI %>%
+  split(.$Product) %>%
+  map(~ ggplot(.x, aes(x = BioLongtermAvg, y = GPPLongtermAvg, color = AI)) +
+        geom_point() +
+        scale_color_gradientn(
+          colors = c("red", "yellow", "blue"),  
+          values = c(0, 0.2, 1),
+          limits = c(0, 10))+
+        labs(x = "Biomass Record Average", 
+             y = "GPP Record Average", 
+             title = paste("Biomass-GPP Longterm Average:", unique(.x$Product))) +
+        theme_minimal() +
+        facet_wrap(~ IGBP_name, scales = "free"))
+#products are "xu", "esa_cci", "liu", "hfbs", "gfw", "gedi", "menlove", "icesat", "lt_gnn", "chopping", "nbcd"
+#run code chunk above and then plots[[name]] to see in window
+ProdPlots[["nbcd"]]
+#===============================================================================
+#Visualize GPP/Bio by Aridity
+#===============================================================================
+Longterm_plot <- ggplot(LongDatwAI, aes(x = AI, y = BioLongtermAvg)) +
+  geom_point() +
+  labs(x = "Aridity", 
+       y = "Biomass Record Average", 
+       title = "Biomass-Aridity Longterm Average Comparison") +
+  theme_minimal() +
+  facet_wrap(~ Product, scales = "free")
+Longterm_plot
+
+Longterm_plot <- ggplot(LongDatwAI, aes(x = AI, y = GPPLongtermAvg)) +
+  geom_point() +
+  labs(x = "Aridity", 
+       y = "GPP Record Average", 
+       title = "GPP-Aridity Longterm Average Comparison") +
+  theme_minimal() +
+  facet_wrap(~ Product, scales = "free")
+Longterm_plot
 #===============================================================================
 #Visualize Annual Zscore Values for Multi-Year Products
 #===============================================================================

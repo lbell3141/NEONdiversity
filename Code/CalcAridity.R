@@ -35,4 +35,5 @@ siteAI <- bind_rows(sitePET_list)%>%
   summarize(PET = mean(PET, na.rm = T),
             P = mean(P, na.rm = T))%>%
   mutate(AI = P/PET)
-plot(siteAI$AI)
+
+LongDatwAI <- merge(AllProdLongtermDat, siteAI, by = "SiteID")
