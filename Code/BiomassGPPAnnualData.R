@@ -19,7 +19,7 @@ library(lubridate)
 #===============================================================================
 BiomassData <- "./Data/AnnualBiomassProducts.csv"
 FluxDataFolder <- "X:/moore/FluxNetData"
-IGBPmetadata <- "./Data/AmfIGBPmetadata.csv"
+IGBPmetadata <- "./Data/AMF_AA-Net_BIF_CCBY4_20250201.csv"
 #ScriptOutputPath <- "./Data/ScriptOutput/NormalizedBioGPP.csv"
 #===============================================================================
 #3. Calculate Biomass Annual Zscores by Site
@@ -73,8 +73,10 @@ FluxZscoreDf <- results_df%>%
 #5. Combine Biomass, Flux, and IGBP Dataframes
 #===============================================================================
 IGBP_df <- read.csv(IGBPmetadata)%>%
-  select(SITEID, IGBP_name)%>%
-  rename(SiteID = SITEID)
+  filter(VARIABLE == "IGBP")%>%
+  select(-c(VARIABLE_GROUP, VARIABLE, GROUP_ID))%>%
+  rename(SiteID = SITE_ID,
+         IGBP_PI = DATAVALUE)
 
 gppbio <- merge(BioZscoreDf, FluxZscoreDf, by = c("SiteID", "Year"))
 gppbio <- merge(gppbio, IGBP_df, by = "SiteID")
@@ -123,7 +125,9 @@ BF_dfb <- BF_dfa%>%
 AllProdLongtermDat <- rbind(BF_dfb, DateRangeFluxBio)
 #add IGBP classification 
 IGBP_df <- read.csv(IGBPmetadata)%>%
-  select(SITEID, IGBP_name)%>%
-  rename(SiteID = SITEID)
+  filter(VARIABLE == "IGBP")%>%
+  select(-c(VARIABLE_GROUP, VARIABLE, GROUP_ID))%>%
+  rename(SiteID = SITE_ID,
+         IGBP_PI = DATAVALUE)
 AllProdLongtermDat <- merge(AllProdLongtermDat, IGBP_df, by = "SiteID")%>%
   filter(BioLongtermAvg != 0)

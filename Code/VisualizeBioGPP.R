@@ -10,12 +10,12 @@ library(viridis)
 #===============================================================================
 #Visualize Longterm Flux/Biomass Averages by Product
 #===============================================================================
-Longterm_plot <- ggplot(AllProdLongtermDat, aes(x = BioLongtermAvg, y = GPPLongtermAvg, color = IGBP_name)) +
+Longterm_plot <- ggplot(AllProdLongtermDat, aes(x = BioLongtermAvg, y = GPPLongtermAvg, color = IGBP_PI)) +
   geom_point() +
   labs(x = "Biomass Record Average", 
        y = "GPP Record Average", 
        title = "Biomass-GPP Longterm Average Comparison",
-       color = "IGBP_name") +
+       color = "IGBP_PI") +
   theme_minimal() +
   facet_wrap(~ Product, scales = "free")
 Longterm_plot
@@ -29,7 +29,7 @@ Longterm_plot <- ggplot(AllProdLongtermDat, aes(x = BioLongtermAvg, y = GPPLongt
        title = "Biomass-GPP Longterm Average Comparison",
        color = "Product") +
   theme_minimal() +
-  facet_wrap(~ IGBP_name, scales = "free")
+  facet_wrap(~ IGBP_PI, scales = "free")
 Longterm_plot
 
 #===============================================================================
@@ -43,7 +43,7 @@ ProdPlots <- AllProdLongtermDat %>%
              y = "GPP Record Average", 
              title = paste("Biomass-GPP Longterm Average:", unique(.x$Product))) +
         theme_minimal() +
-        facet_wrap(~ IGBP_name, scales = "free"))
+        facet_wrap(~ IGBP_PI, scales = "free"))
 #products are "xu", "esa_cci", "liu", "hfbs", "gfw", "gedi", "menlove", "icesat", "lt_gnn", "chopping", "nbcd"
 #run code chunk above and then plots[[name]] to see in window
 ProdPlots[["xu"]]
@@ -76,10 +76,10 @@ ProdPlots <- LongDatwAI %>%
              y = "GPP Record Average", 
              title = paste("Biomass-GPP Longterm Average:", unique(.x$Product))) +
         theme_minimal() +
-        facet_wrap(~ IGBP_name, scales = "free"))
+        facet_wrap(~ IGBP_PI, scales = "free"))
 #products are "xu", "esa_cci", "liu", "hfbs", "gfw", "gedi", "menlove", "icesat", "lt_gnn", "chopping", "nbcd"
 #run code chunk above and then plots[[name]] to see in window
-ProdPlots[["nbcd"]]
+ProdPlots[["gedi"]]
 #===============================================================================
 #Visualize GPP/Bio by Aridity
 #===============================================================================
@@ -112,12 +112,12 @@ AllProdAllSites <- ggplot(gppbio, aes(x = BiomassZscore, y = GPPZScore, color = 
   theme_minimal()
 AllProdAllSites
 
-AllSitesByProd <- ggplot(gppbio, aes(x = BiomassZscore, y = GPPZScore, color = IGBP_name)) +
+AllSitesByProd <- ggplot(gppbio, aes(x = BiomassZscore, y = GPPZScore, color = IGBP_PI)) +
   geom_point() +
   labs(x = "Biomass Z-Score", 
        y = "GPP Z-Score", 
        title = "Biomass-GPP Comparison",
-       color = "IGBP_name") +
+       color = "IGBP_PI") +
   theme_minimal() +
   facet_wrap(~ Product, scales = "free")
 AllSitesByProd
@@ -130,9 +130,9 @@ ProdPlotsAnnual <- gppbio %>%
              y = "GPP Annual Z Score", 
              title = paste("Biomass-GPP Annual Z Score Comparison:", unique(.x$Product))) +
         theme_minimal() +
-        facet_wrap(~ IGBP_name, scales = "free"))
+        facet_wrap(~ IGBP_PI, scales = "free"))
 #products are "xu", "esa_cci", "liu, "lt_gnn", "chopping"
 #run code chunk above and then plots[[name]] to see in window
-ProdPlotsAnnual[["chopping"]]
+ProdPlotsAnnual[["xu"]]
 
 
