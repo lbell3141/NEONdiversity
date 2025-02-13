@@ -46,7 +46,7 @@ ProdPlots <- AllProdLongtermDat %>%
         facet_wrap(~ IGBP_PI, scales = "free"))
 #products are "xu", "esa_cci", "liu", "hfbs", "gfw", "gedi", "menlove", "icesat", "lt_gnn", "chopping", "nbcd"
 #run code chunk above and then plots[[name]] to see in window
-ProdPlots[["xu"]]
+ProdPlots[["nbcd"]]
 #===============================================================================
 #Visualize Longterm Flux/Biomass Averages by Aridity
 #===============================================================================
@@ -79,7 +79,7 @@ ProdPlots <- LongDatwAI %>%
         facet_wrap(~ IGBP_PI, scales = "free"))
 #products are "xu", "esa_cci", "liu", "hfbs", "gfw", "gedi", "menlove", "icesat", "lt_gnn", "chopping", "nbcd"
 #run code chunk above and then plots[[name]] to see in window
-ProdPlots[["gedi"]]
+ProdPlots[["nbcd"]]
 #===============================================================================
 #Visualize GPP/Bio by Aridity
 #===============================================================================
