@@ -71,7 +71,8 @@ rec_avg <- combovar%>%
   summarise(LongtermLAI = mean(AverageLAI, na.rm = T),
             LongtermGPP = mean(GPP_DT_VUT_75, na.rm = T))
 
-vegclasslongterm <- merge(rec_avg, IGBP_df, by = "SiteID")
+vegclasslongterm <- merge(rec_avg, woodherb_df, by = "SiteID")%>%
+  filter(Group != "Unclassified")
 
 #plot relationship 
 longtermGPPLAI <- ggplot(vegclasslongterm, aes(LongtermLAI, LongtermGPP))+
@@ -83,10 +84,15 @@ longtermGPPLAI
 
 longtermGPPLAIigbp <- ggplot(vegclasslongterm, aes(LongtermLAI, LongtermGPP)) +
   geom_point() +
+  geom_line(stat = "smooth", method = "lm", se = F, color = "maroon", alpha = 0.5)+
+  stat_poly_eq(
+    aes(label = paste(..rr.label.., sep = "~~~")),
+    formula = y ~ x,
+    parse = T) +
   labs(x = "LAI Longterm Average", 
        y = "GPP Longterm Average") +
   theme_minimal() +
-  facet_wrap(~ IGBP_PI, scales = "free")
+  facet_wrap(~ Group)
 longtermGPPLAIigbp
 
 
