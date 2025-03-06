@@ -22,6 +22,16 @@ ggplot(woodherb_df, aes(x = factor(Group)))+
   theme_minimal()
 #TRY explore data
 
-PathToTRYdata <- "./Data/TRY_PlantTraitDatabase_SLA/39636.txt"
+PathToTRYdataSLA <- "./Data/TRY_PlantTraitDatabase_SLA/39636.txt"
+PathToTRYdataLCC <- "./Data/TRY_PlantTraitDatabase/LCC/39686.txt"
 
-trydat <- read.table(PathToTRYdata, sep = "\t", header = TRUE, fill = TRUE, quote = "")
+trydatSLA <- read.table(PathToTRYdataSLA, sep = "\t", header = TRUE, fill = TRUE, quote = "")
+
+trydatLCC <- read.table(PathToTRYdataLCC, sep = "\t", header = TRUE, fill = TRUE, quote = "")
+
+test <- trydatLCC%>%
+  filter(TraitID == 570,
+         OrigValueStr != "")%>%
+  select(SpeciesName, OrigValueStr, OrigUnitStr, OrigUncertaintyStr)%>%
+  arrange(SpeciesName)
+
