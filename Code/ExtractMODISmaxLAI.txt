@@ -1,0 +1,45 @@
+// Load tower location file (includes tower lat/longs and site names)
+var table = ee.FeatureCollection("projects/ee-lbell121233/assets/TowerLocations");
+
+// Load MODIS product, select variable, remove no data codes (-9999)
+var modisLAI = ee.ImageCollection("MODIS/061/MCD15A3H")
+    .select('Lai')
+    .map(function(image) {
+        return image.updateMask(image.neq(-9999));
+    });
+
+// Define years to extract data from 
+var years = ee.List.sequence(2000, 2024);
+
+// Create a function to find the peak annual LAI value at each point location
+var extractAnnualLAI = function(year) {
+    year = ee.Number(year);
+    
+    var annualLAI = modisLAI
+        .filterDate(ee.Date.fromYMD(year, 1, 1), ee.Date.fromYMD(year, 12, 31))
+        .max();  // Use max() to get the peak LAI value
+
+    // Check to see if there's band data; if no data, skip over and return no value
+    var laiBandCount = annualLAI.bandNames().size();
+    return ee.Algorithms.If(
+        laiBandCount.gt(0),
+        annualLAI.reduceRegions({
+            collection: table,
+            reducer: ee.Reducer.max(),  // Use max() to get the peak value
+            scale: 500
+        }).map(function(feature) {
+            return feature.set('year', year);
+        }),
+        ee.FeatureCollection([])
+    );
+};
+
+// Apply function and loop through each year
+var laiResults = ee.FeatureCollection(years.map(extractAnnualLAI)).flatten();
+
+// Save results
+Export.table.toDrive({
+    collection: laiResults,
+    description: 'Annual_MODIS_LAI_Peak_Extraction',  // Update the description to reflect peak extraction
+    fileFormat: 'CSV'
+});
