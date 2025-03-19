@@ -1,11 +1,11 @@
 #get site species list from BADM
 
 library(dplyr)
-
+library(tidyr)
 
 PathToBADM <- "./Data/AMF_AA-Net_BIF_CCBY4_20250201.csv"
 PathtoNRCScodes <- "./Data/NRCS_PlantCodes.csv"
-badm <- read.csv(IGBPmetadata)
+badm <- read.csv(PathToBADM)
 PlantCodes <- read.csv(PathtoNRCScodes, skip = 1, header = T)
 
 sp_df <- badm%>%
@@ -38,5 +38,15 @@ PlantCodes <- PlantCodes %>%
 nrcs_col <- left_join(nrcs_col, PlantCodes, by = "NRCS_ID") %>%
   mutate(Species = if_else(is.na(Species), Species_lookup, Species)) %>%
   select(-Species_lookup)
+
+
+#add study classifications
+classdf <- merge(nrcs_col, woodherb_df, by = "SiteID")%>%
+  filter(Group != "Unclassified")
+#first LCC site data check:
+LCC_siteSp <- merge(classdf, famLCC, by = "Species")
+
+
+
 
 

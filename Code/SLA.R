@@ -3,6 +3,7 @@ library(stringr)
 library(ggplot2)
 library(taxize)
 library(tidyr)
+library(data.table)
 
 #IGBP reclass into herb, woody, mixed
 IGBPmetadata <- "./Data/AMF_AA-Net_BIF_CCBY4_20250201.csv"
@@ -28,15 +29,24 @@ ggplot(woodherb_df, aes(x = factor(Group)))+
 veg_dat <- badm %>%
   filter(grepl("SPP", VARIABLE_GROUP))
 
-
+write.csv(woodherb_df, "./Data/SiteIGBPdomcov.csv", row.names = F)
 
 #TRY explore data
 
-PathToTRYdataSLA <- "./Data/TRY_PlantTraitDatabase_SLA/39636.txt"
+PathToTRYdataSLA <- "./Data/TRY_PlantTraitDatabase/SLA/39636.txt"
 trydatSLA <- read.table(PathToTRYdataSLA, sep = "\t", header = TRUE, fill = TRUE, quote = "")
-
 PathToTRYdataLCC <- "./Data/TRY_PlantTraitDatabase/LCC/39686.txt"
 trydatLCC <- read.table(PathToTRYdataLCC, sep = "\t", header = TRUE, fill = TRUE, quote = "")
+PathToTRYdataGF <- "./Data/TRY_PlantTraitDatabase/GrowthForm/39729.txt"
+trydatGF <- fread(PathToTRYdataGF, sep = "\t", encoding = "UTF-8", quote = "")
+
+GF_datcoi <- trydatGF%>%
+  filter(TraitID == 42,
+         OrigValueStr != "",
+         SpeciesName != "")%>%
+  select(SpeciesName, OrigValueStr)%>%
+  arrange(SpeciesName)%>%
+  rename(Species = SpeciesName)
 
 try_coi <- trydatLCC%>%
   filter(TraitID == 570,
@@ -76,3 +86,39 @@ taxLCC <- merge(coiunits, fam_df, by = "SpeciesName")%>%
   group_by(Family)%>%
   summarize(avgCC = mean(CarbonContent, na.rm = T),
          seCC = sd(CarbonContent, na.rm = TRUE) / sqrt(n()))
+famLCC <- merge(coiunits, fam_df, by = "SpeciesName")%>%
+  group_by(SpeciesName)%>%
+  mutate(avgCC = mean(CarbonContent, na.rm = T),
+            seCC = sd(CarbonContent, na.rm = TRUE) / sqrt(n()))%>%
+  select(Family, SpeciesName, avgCC, seCC)%>%
+  distinct()%>%
+  rename(Species = SpeciesName)
+#write.csv(famLCC, "./Data/TRY_PlantTraitDatabase/LCC/famLCC.csv")
+
+LCC_GF <- merge(famLCC, GF_datcoi, by = "Species")%>%
+  distinct()
+
+choose_category <- function(values) {
+  if (any(values %in% c("tree", "Tree", "T"))) {
+    return("tree")
+  } else if (any(values %in% c("shrub", "Shrub"))) {
+    return("shrub")
+  } else if (any(values %in% c("grass", "Grass", "herb", "Herb", "H"))) {
+    return("grass")
+  } else {
+    return(NA)
+  }
+}
+
+df_grouped <- LCC_GF %>%
+  group_by(Species) %>%
+  summarise(
+    Family = first(Family),  
+    avgCC = first(avgCC),  
+    seCC = first(seCC),    
+    OrigValueStr = choose_category(OrigValueStr)
+  ) %>%
+  filter(!is.na(OrigValueStr)) %>%
+  ungroup()
+
+write.csv(df_grouped, "./Data/TRY_PlantTraitDatabase/GrowthForm/GrowthForm.csv", row.names = F)
